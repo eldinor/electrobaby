@@ -1,6 +1,6 @@
-# BabylonPress 3D Viewer
+# BabylonPress GLB Viewer
 
-BabylonPress 3D Viewer is a desktop GLB viewer for Windows built with Electron and Babylon Viewer.
+BabylonPress GLB Viewer is a desktop GLB viewer for Windows built with Electron and Babylon Viewer.
 
 It is designed as a lightweight desktop shell around `@babylonjs/viewer`, with file opening, recent files, drag-and-drop, view settings, camera settings, and in-app help.
 
@@ -14,7 +14,7 @@ It is designed as a lightweight desktop shell around `@babylonjs/viewer`, with f
 - `Settings -> View...`
 - `Settings -> Camera...`
 - `Help -> User Guide`
-- `Help -> About BabylonPress 3D Viewer`
+- `Help -> About BabylonPress GLB Viewer`
 - Windows packaging with `electron-builder`
 
 ## Tech Stack
@@ -49,6 +49,12 @@ npm run dist
 
 Build output is generated in `dist/`.
 
+For a release-preview build without an installer, you can also run:
+
+```bash
+npm run dist:dir
+```
+
 ## Main Shortcuts
 
 - `Ctrl+O` or `Cmd+O`: Open a model
@@ -59,11 +65,20 @@ Build output is generated in `dist/`.
 
 ## GitHub Releases
 
-You can distribute desktop builds through GitHub Releases by:
+You can distribute desktop builds through GitHub Releases manually or through GitHub Actions.
+
+Manual flow:
 
 1. Running `npm run dist`
 2. Taking the generated files from `dist/`
 3. Uploading them as release assets on GitHub
+
+Automated flow:
+
+- Push a tag such as `v1.0.0`
+- GitHub Actions will build the Windows release and attach assets automatically
+
+See `RELEASE.md` for the release checklist.
 
 ## Current Limitations
 

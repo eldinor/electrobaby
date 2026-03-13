@@ -5,7 +5,7 @@ function toFileUrl(windowsPath) {
 
 const DEFAULT_ENVIRONMENT_SOURCE = "auto";
 const FALLBACK_APP_CONFIG = {
-  productName: "BabylonPress 3D Viewer",
+  productName: "BabylonPress GLB Viewer",
   description: "Desktop GLB viewer powered by Babylon Viewer and Electron.",
   links: {
     website: "https://babylonpress.org/",
@@ -603,7 +603,7 @@ async function hydrateAboutPanel() {
 
   try {
     const appInfo = window.desktopViewer?.getAppInfo ? await window.desktopViewer.getAppInfo() : null;
-    nameElement.textContent = appInfo?.name || APP_CONFIG.productName || "BabylonPress 3D Viewer";
+    nameElement.textContent = appInfo?.name || APP_CONFIG.productName || "BabylonPress GLB Viewer";
     versionElement.textContent = `Version ${appInfo?.version || "1.0.0"}`;
     descriptionElement.textContent =
       appInfo?.description || APP_CONFIG.description || "Desktop GLB viewer powered by Babylon Viewer and Electron.";

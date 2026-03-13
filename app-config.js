@@ -1,7 +1,7 @@
 const APP_CONFIG = {
   appId: "com.babylonpress.viewer",
   internalName: "electrobaby",
-  productName: "BabylonPress 3D Viewer",
+  productName: "BabylonPress GLB Viewer",
   description: "Desktop GLB viewer powered by Babylon Viewer and Electron.",
   links: {
     website: "https://babylonpress.org/",
@@ -37,7 +37,7 @@ const APP_CONFIG = {
     openModelDialogTitle: "Open GLB file",
     modelFilterName: "3D Models",
     helpMenuLabel: "User Guide",
-    aboutMenuLabel: "About BabylonPress 3D Viewer"
+    aboutMenuLabel: "About BabylonPress GLB Viewer"
   },
   copy: {
     emptyState: {
