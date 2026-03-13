@@ -1,30 +1,61 @@
 {
   "name": "electrobaby",
   "version": "1.0.0",
+  "productName": "BabylonPress 3D Viewer",
   "license": "Apache-2.0",
   "description": "ElectroBaby  - BabylonPress desktop GLB viewer powered by Babylon Viewer and Electron.",
+  "author": "BabylonPress",
   "main": "main.js",
+  "homepage": "https://github.com/eldinor/electrobaby",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eldinor/electrobaby.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eldinor/electrobaby/issues"
+  },
+  "keywords": [
+    "babylonjs",
+    "babylon-viewer",
+    "electron",
+    "glb",
+    "3d-viewer",
+    "windows"
+  ],
   "scripts": {
     "start": "powershell -Command \"Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue; electron .\"",
-    "dist": "electron-builder --win"
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir"
   },
   "dependencies": {
-    "@babylonjs/viewer": "^7.0.0"
+    "@babylonjs/viewer": "^8.55.1"
   },
   "devDependencies": {
-    "electron": "^30.5.1",
-    "electron-builder": "^24.13.3"
+    "electron": "^41.0.2",
+    "electron-builder": "^26.8.1"
   },
   "build": {
-    "appId": "com.winbab.viewer",
+    "appId": "com.electrobaby.viewer",
     "productName": "BabylonPress 3D Viewer",
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "directories": {
+      "output": "dist"
+    },
     "files": [
       "**/*",
       "!dist/**"
     ],
     "win": {
-      "target": "nsis",
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "bplogo.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "fileAssociations": [
       {

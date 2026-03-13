@@ -382,147 +382,99 @@
   <div id="status-banner" class="hidden" role="status" aria-live="polite"></div>
   <div id="empty-state">
     <div class="empty-card">
-      <h1>Drop a GLB file to begin</h1>
-      <p>Drag a <kbd>.glb</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model</p>
+      <h1 id="empty-state-title"></h1>
+      <p id="empty-state-body"></p>
     </div>
   </div>
   <aside id="settings-panel" class="hidden" aria-label="View settings">
     <div class="settings-header">
-      <h2>View Settings</h2>
-      <button id="close-settings-button" type="button">Close</button>
+      <h2 id="view-panel-title"></h2>
+      <button id="close-settings-button" type="button"></button>
     </div>
     <div class="settings-group">
-      <label for="tone-mapping-select">Tone Mapping</label>
+      <label id="tone-mapping-label" for="tone-mapping-select"></label>
       <select id="tone-mapping-select">
-        <option value="standard">Standard</option>
-        <option value="aces">ACES</option>
-        <option value="neutral">Neutral</option>
-        <option value="none">None</option>
+        <option id="tone-mapping-option-standard" value="standard"></option>
+        <option id="tone-mapping-option-aces" value="aces"></option>
+        <option id="tone-mapping-option-neutral" value="neutral"></option>
+        <option id="tone-mapping-option-none" value="none"></option>
       </select>
     </div>
     <div class="settings-group">
-      <label for="exposure-range">Exposure</label>
+      <label id="exposure-label" for="exposure-range"></label>
       <input id="exposure-range" type="range" min="0.5" max="2" step="0.05" />
       <output id="exposure-value" for="exposure-range"></output>
     </div>
     <div class="settings-group">
-      <label for="contrast-range">Contrast</label>
+      <label id="contrast-label" for="contrast-range"></label>
       <input id="contrast-range" type="range" min="0.5" max="2" step="0.05" />
       <output id="contrast-value" for="contrast-range"></output>
     </div>
     <div class="settings-group">
-      <label for="environment-intensity-range">Environment Intensity</label>
+      <label id="environment-intensity-label" for="environment-intensity-range"></label>
       <input id="environment-intensity-range" type="range" min="0" max="2" step="0.05" />
       <output id="environment-intensity-value" for="environment-intensity-range"></output>
     </div>
     <div class="settings-group">
-      <label for="environment-rotation-range">Environment Rotation</label>
+      <label id="environment-rotation-label" for="environment-rotation-range"></label>
       <input id="environment-rotation-range" type="range" min="0" max="6.28" step="0.01" />
       <output id="environment-rotation-value" for="environment-rotation-range"></output>
     </div>
     <div class="settings-group">
-      <label for="skybox-blur-range">Skybox Blur</label>
+      <label id="skybox-blur-label" for="skybox-blur-range"></label>
       <input id="skybox-blur-range" type="range" min="0" max="1" step="0.01" />
       <output id="skybox-blur-value" for="skybox-blur-range"></output>
     </div>
     <div class="settings-group">
       <div class="settings-row">
-        <label for="environment-visible-checkbox">Show Environment</label>
+        <label id="environment-visible-label" for="environment-visible-checkbox"></label>
         <input id="environment-visible-checkbox" type="checkbox" />
       </div>
     </div>
     <div class="settings-group">
-      <label for="background-color-input">Background Color</label>
+      <label id="background-color-label" for="background-color-input"></label>
       <input id="background-color-input" type="color" value="#1e1e1e" />
     </div>
     <div class="settings-actions">
-      <button id="reset-view-settings-button" type="button">Reset View Settings</button>
+      <button id="reset-view-settings-button" type="button"></button>
     </div>
   </aside>
   <aside id="camera-settings-panel" class="hidden" aria-label="Camera settings">
     <div class="settings-header">
-      <h2>Camera Settings</h2>
-      <button id="close-camera-settings-button" type="button">Close</button>
+      <h2 id="camera-panel-title"></h2>
+      <button id="close-camera-settings-button" type="button"></button>
     </div>
     <div class="settings-group">
       <div class="settings-row">
-        <label for="camera-auto-rotate-checkbox">Auto Rotate</label>
+        <label id="camera-auto-rotate-label" for="camera-auto-rotate-checkbox"></label>
         <input id="camera-auto-rotate-checkbox" type="checkbox" />
       </div>
     </div>
     <div class="settings-group">
-      <label for="camera-auto-rotate-speed-range">Auto Rotate Speed</label>
+      <label id="camera-auto-rotate-speed-label" for="camera-auto-rotate-speed-range"></label>
       <input id="camera-auto-rotate-speed-range" type="range" min="0.1" max="4" step="0.1" />
       <output id="camera-auto-rotate-speed-value" for="camera-auto-rotate-speed-range"></output>
     </div>
     <div class="settings-group">
-      <label for="camera-auto-rotate-delay-range">Auto Rotate Delay</label>
+      <label id="camera-auto-rotate-delay-label" for="camera-auto-rotate-delay-range"></label>
       <input id="camera-auto-rotate-delay-range" type="range" min="0" max="5000" step="100" />
       <output id="camera-auto-rotate-delay-value" for="camera-auto-rotate-delay-range"></output>
     </div>
     <div class="settings-actions">
-      <button id="reset-camera-settings-button" type="button">Reset Camera Settings</button>
+      <button id="reset-camera-settings-button" type="button"></button>
     </div>
   </aside>
   <aside id="help-panel" class="hidden" aria-label="User guide">
     <div class="settings-header">
-      <h2>User Guide</h2>
+      <h2 id="help-panel-title">User Guide</h2>
       <button id="close-help-panel-button" type="button">Close</button>
     </div>
-    <div class="help-copy">
-      <div class="help-grid">
-        <section class="help-card">
-          <h3>Open a Model</h3>
-          <ol>
-            <li>Choose <kbd>File</kbd> -> <kbd>Open...</kbd>.</li>
-            <li>Select a valid <kbd>.glb</kbd> file.</li>
-            <li>The model will load in the viewer.</li>
-          </ol>
-        </section>
-        <section class="help-card">
-          <h3>Drag and Drop</h3>
-          <p>Drop a <kbd>.glb</kbd> file directly into the window to open it.</p>
-          <p>If the file is invalid, the status banner will explain that the file should be checked.</p>
-        </section>
-        <section class="help-card">
-          <h3>Recent Items</h3>
-          <ul>
-            <li><kbd>File</kbd> -> <kbd>Open Recent</kbd></li>
-            <li><kbd>File</kbd> -> <kbd>Open Recent Folder</kbd></li>
-            <li><kbd>File</kbd> -> <kbd>Reopen Last On Startup</kbd></li>
-          </ul>
-        </section>
-        <section class="help-card">
-          <h3>Shortcuts</h3>
-          <ul>
-            <li><kbd>Ctrl+O</kbd> / <kbd>Cmd+O</kbd>: Open model</li>
-            <li><kbd>F1</kbd>: Open Help</li>
-            <li><kbd>F11</kbd>: Fullscreen on Windows/Linux</li>
-            <li><kbd>Esc</kbd>: Close open panels</li>
-          </ul>
-        </section>
-      </div>
-      <section>
-        <h3>View Settings</h3>
-        <p>Open <kbd>Settings</kbd> -> <kbd>View...</kbd> to adjust tone mapping, exposure, contrast, environment intensity, environment rotation, skybox blur, environment visibility, and background color.</p>
-      </section>
-      <section>
-        <h3>Camera Settings</h3>
-        <p>Open <kbd>Settings</kbd> -> <kbd>Camera...</kbd> to control auto rotate, auto rotate speed, and auto rotate delay.</p>
-      </section>
-      <section>
-        <h3>Troubleshooting</h3>
-        <ul>
-          <li>If a model does not load, confirm that the file is a valid <kbd>.glb</kbd>.</li>
-          <li>If the scene looks too dark, enable <kbd>Show Environment</kbd> in <kbd>Settings</kbd> -> <kbd>View...</kbd>.</li>
-        </ul>
-      </section>
-    </div>
+    <div id="help-panel-content" class="help-copy"></div>
   </aside>
   <aside id="about-panel" class="hidden" aria-label="About BabylonPress 3D Viewer">
     <div class="settings-header">
-      <h2>About</h2>
-      <button id="close-about-panel-button" type="button">Close</button>
+      <h2 id="about-panel-title">About</h2>
+      <button id="close-about-panel-button" type="button"></button>
     </div>
     <div class="about-copy">
       <div class="about-brand">
@@ -533,17 +485,9 @@
         </div>
       </div>
       <p id="about-app-description">Desktop GLB viewer powered by Babylon Viewer and Electron.</p>
-      <div class="about-links">
-        <a href="https://babylonpress.org/" target="_blank" rel="noreferrer">Created by BabylonPress.org</a>
-      </div>
-      <div class="about-meta">
-        <p><strong>Supported format:</strong> GLB</p>
-        <p><strong>Main actions:</strong> Open, drag-and-drop, recent files, view settings, camera settings</p>
-        <p><strong>Help shortcut:</strong> F1</p>
-      </div>
-      <div class="about-links">
-        <a href="https://example.com/source" target="_blank" rel="noreferrer">Source</a>
-      </div>
+      <div id="about-primary-links" class="about-links"></div>
+      <div id="about-meta" class="about-meta"></div>
+      <div id="about-secondary-links" class="about-links"></div>
     </div>
   </aside>
   <babylon-viewer id="viewer"></babylon-viewer>

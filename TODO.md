@@ -41,3 +41,21 @@
 ## Later
 
 - Prepare for macOS packaging and platform polish when ready.
+
+## Ideas
+
+- Polish the window title so the current file name is shown more cleanly.
+- Add `Open Containing Folder` for the current file and recent items.
+- Add `Copy File Path` for the current file.
+- Detect common GLB parse failures and show friendlier error messages.
+- Add a single `Restore All Defaults` action for View and Camera settings.
+- Improve keyboard accessibility and focus behavior inside panels.
+- Remember panel size later if panels ever become resizable.
+- Disable menu actions that do nothing when no model is loaded.
+- Add a small file info panel with file name, full path, file size, and modified date.
+- Add `Reload Current File` for faster iteration while editing GLBs.
+- Harden command-line file opening behavior, especially for repeated launches and paths with spaces.
+- Validate and normalize external About links before opening them.
+- Add a copyable diagnostics block with app version, Electron version, Babylon Viewer version, and OS info.
+- Tighten the app Content Security Policy before release.
+- Add tests for settings, recents, menu logic, and IPC handlers.

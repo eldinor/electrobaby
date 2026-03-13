@@ -3,24 +3,93 @@ function toFileUrl(windowsPath) {
   return encodeURI(`file:///${normalized}`);
 }
 
-const VIEW_SETTINGS_STORAGE_KEY = "babylonpress.viewSettings";
-const CAMERA_SETTINGS_STORAGE_KEY = "babylonpress.cameraSettings";
 const DEFAULT_ENVIRONMENT_SOURCE = "auto";
-const DEFAULT_VIEW_SETTINGS = {
-  toneMapping: "standard",
-  exposure: 1,
-  contrast: 1,
-  environmentIntensity: 1,
-  environmentRotation: 0,
-  skyboxBlur: 0.3,
-  environmentVisible: true,
-  backgroundColor: "#1e1e1e"
+const FALLBACK_APP_CONFIG = {
+  productName: "BabylonPress 3D Viewer",
+  description: "Desktop GLB viewer powered by Babylon Viewer and Electron.",
+  links: {
+    website: "https://babylonpress.org/",
+    source: "https://example.com/source"
+  },
+  defaults: {
+    viewSettings: {
+      toneMapping: "standard",
+      exposure: 1,
+      contrast: 1,
+      environmentIntensity: 1,
+      environmentRotation: 0,
+      skyboxBlur: 0.3,
+      environmentVisible: false,
+      backgroundColor: "#1e1e1e"
+    },
+    cameraSettings: {
+      autoRotate: false,
+      autoRotateSpeed: 0.3,
+      autoRotateDelay: 2000
+    }
+  },
+  copy: {
+    emptyState: {
+      title: "Drop a GLB file to begin",
+      bodyHtml: 'Drag a <kbd>.glb</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model'
+    },
+    viewPanel: {
+      title: "View Settings",
+      closeLabel: "Close",
+      resetLabel: "Reset View Settings",
+      fields: {
+        toneMapping: "Tone Mapping",
+        toneMappingOptions: {
+          standard: "Standard",
+          aces: "ACES",
+          neutral: "Neutral",
+          none: "None"
+        },
+        exposure: "Exposure",
+        contrast: "Contrast",
+        environmentIntensity: "Environment Intensity",
+        environmentRotation: "Environment Rotation",
+        skyboxBlur: "Skybox Blur",
+        environmentVisible: "Show Environment",
+        backgroundColor: "Background Color"
+      }
+    },
+    cameraPanel: {
+      title: "Camera Settings",
+      closeLabel: "Close",
+      resetLabel: "Reset Camera Settings",
+      fields: {
+        autoRotate: "Auto Rotate",
+        autoRotateSpeed: "Auto Rotate Speed",
+        autoRotateDelay: "Auto Rotate Delay"
+      }
+    },
+    help: {
+      title: "User Guide",
+      cards: [],
+      sections: []
+    },
+    about: {
+      title: "About",
+      closeLabel: "Close",
+      createdByLabel: "Created by BabylonPress.org",
+      sourceLabel: "Source",
+      meta: []
+    }
+  }
 };
-const DEFAULT_CAMERA_SETTINGS = {
-  autoRotate: false,
-  autoRotateSpeed: 0.3,
-  autoRotateDelay: 2000
-};
+let APP_CONFIG = FALLBACK_APP_CONFIG;
+
+function getDefaultViewSettings() {
+  return APP_CONFIG.defaults?.viewSettings || FALLBACK_APP_CONFIG.defaults.viewSettings;
+}
+
+function getDefaultCameraSettings() {
+  return APP_CONFIG.defaults?.cameraSettings || FALLBACK_APP_CONFIG.defaults.cameraSettings;
+}
+
+let currentViewSettings = { ...getDefaultViewSettings() };
+let currentCameraSettings = { ...getDefaultCameraSettings() };
 
 function getFileName(filePath) {
   return filePath.split(/[/\\]/).pop() || "Viewer";
@@ -49,6 +118,62 @@ function setEmptyStateVisible(isVisible) {
   emptyState.classList.toggle("hidden", !isVisible);
 }
 
+function renderEmptyStateCopy() {
+  const titleElement = document.getElementById("empty-state-title");
+  const bodyElement = document.getElementById("empty-state-body");
+  const emptyStateCopy = APP_CONFIG.copy?.emptyState;
+
+  if (!titleElement || !bodyElement || !emptyStateCopy) {
+    return;
+  }
+
+  titleElement.textContent = emptyStateCopy.title;
+  bodyElement.innerHTML = emptyStateCopy.bodyHtml;
+}
+
+function renderSettingsPanelCopy() {
+  const viewPanelCopy = APP_CONFIG.copy?.viewPanel;
+  const cameraPanelCopy = APP_CONFIG.copy?.cameraPanel;
+  const aboutCopy = APP_CONFIG.copy?.about;
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element && typeof value === "string") {
+      element.textContent = value;
+    }
+  };
+
+  if (viewPanelCopy) {
+    setText("view-panel-title", viewPanelCopy.title);
+    setText("close-settings-button", viewPanelCopy.closeLabel);
+    setText("reset-view-settings-button", viewPanelCopy.resetLabel);
+    setText("tone-mapping-label", viewPanelCopy.fields?.toneMapping);
+    setText("tone-mapping-option-standard", viewPanelCopy.fields?.toneMappingOptions?.standard);
+    setText("tone-mapping-option-aces", viewPanelCopy.fields?.toneMappingOptions?.aces);
+    setText("tone-mapping-option-neutral", viewPanelCopy.fields?.toneMappingOptions?.neutral);
+    setText("tone-mapping-option-none", viewPanelCopy.fields?.toneMappingOptions?.none);
+    setText("exposure-label", viewPanelCopy.fields?.exposure);
+    setText("contrast-label", viewPanelCopy.fields?.contrast);
+    setText("environment-intensity-label", viewPanelCopy.fields?.environmentIntensity);
+    setText("environment-rotation-label", viewPanelCopy.fields?.environmentRotation);
+    setText("skybox-blur-label", viewPanelCopy.fields?.skyboxBlur);
+    setText("environment-visible-label", viewPanelCopy.fields?.environmentVisible);
+    setText("background-color-label", viewPanelCopy.fields?.backgroundColor);
+  }
+
+  if (cameraPanelCopy) {
+    setText("camera-panel-title", cameraPanelCopy.title);
+    setText("close-camera-settings-button", cameraPanelCopy.closeLabel);
+    setText("reset-camera-settings-button", cameraPanelCopy.resetLabel);
+    setText("camera-auto-rotate-label", cameraPanelCopy.fields?.autoRotate);
+    setText("camera-auto-rotate-speed-label", cameraPanelCopy.fields?.autoRotateSpeed);
+    setText("camera-auto-rotate-delay-label", cameraPanelCopy.fields?.autoRotateDelay);
+  }
+
+  if (aboutCopy) {
+    setText("close-about-panel-button", aboutCopy.closeLabel);
+  }
+}
+
 function loadModel(filePath) {
   const viewer = getViewer();
   if (!viewer || !filePath) {
@@ -63,9 +188,11 @@ function loadModel(filePath) {
   setEmptyStateVisible(false);
 }
 
-window.desktopViewer.onOpenModel((filePath) => {
-  loadModel(filePath);
-});
+if (window.desktopViewer?.onOpenModel) {
+  window.desktopViewer.onOpenModel((filePath) => {
+    loadModel(filePath);
+  });
+}
 
 function getErrorMessage(errorLike) {
   const fallback = "The model could not be loaded. Check if the file is a valid GLB.";
@@ -104,69 +231,70 @@ function attachViewerErrorHandling() {
 attachViewerErrorHandling();
 
 function normalizeViewSettings(rawSettings) {
+  const defaultViewSettings = getDefaultViewSettings();
+
   return {
-    toneMapping: typeof rawSettings?.toneMapping === "string" ? rawSettings.toneMapping : DEFAULT_VIEW_SETTINGS.toneMapping,
-    exposure: Number.isFinite(rawSettings?.exposure) ? rawSettings.exposure : DEFAULT_VIEW_SETTINGS.exposure,
-    contrast: Number.isFinite(rawSettings?.contrast) ? rawSettings.contrast : DEFAULT_VIEW_SETTINGS.contrast,
+    toneMapping: typeof rawSettings?.toneMapping === "string" ? rawSettings.toneMapping : defaultViewSettings.toneMapping,
+    exposure: Number.isFinite(rawSettings?.exposure) ? rawSettings.exposure : defaultViewSettings.exposure,
+    contrast: Number.isFinite(rawSettings?.contrast) ? rawSettings.contrast : defaultViewSettings.contrast,
     environmentIntensity: Number.isFinite(rawSettings?.environmentIntensity)
       ? rawSettings.environmentIntensity
-      : DEFAULT_VIEW_SETTINGS.environmentIntensity,
+      : defaultViewSettings.environmentIntensity,
     environmentRotation: Number.isFinite(rawSettings?.environmentRotation)
       ? rawSettings.environmentRotation
-      : DEFAULT_VIEW_SETTINGS.environmentRotation,
-    skyboxBlur: Number.isFinite(rawSettings?.skyboxBlur) ? rawSettings.skyboxBlur : DEFAULT_VIEW_SETTINGS.skyboxBlur,
+      : defaultViewSettings.environmentRotation,
+    skyboxBlur: Number.isFinite(rawSettings?.skyboxBlur) ? rawSettings.skyboxBlur : defaultViewSettings.skyboxBlur,
     environmentVisible:
       typeof rawSettings?.environmentVisible === "boolean"
         ? rawSettings.environmentVisible
-        : DEFAULT_VIEW_SETTINGS.environmentVisible,
+        : defaultViewSettings.environmentVisible,
     backgroundColor:
       typeof rawSettings?.backgroundColor === "string" && /^#[0-9a-fA-F]{6}$/.test(rawSettings.backgroundColor)
         ? rawSettings.backgroundColor
-        : DEFAULT_VIEW_SETTINGS.backgroundColor
+        : defaultViewSettings.backgroundColor
   };
 }
 
 function readViewSettings() {
-  try {
-    const rawValue = window.localStorage.getItem(VIEW_SETTINGS_STORAGE_KEY);
-    if (!rawValue) {
-      return { ...DEFAULT_VIEW_SETTINGS };
-    }
-
-    return normalizeViewSettings(JSON.parse(rawValue));
-  } catch (_error) {
-    return { ...DEFAULT_VIEW_SETTINGS };
-  }
+  return { ...currentViewSettings };
 }
 
-function writeViewSettings(settings) {
-  window.localStorage.setItem(VIEW_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+async function writeViewSettings(settings) {
+  if (!window.desktopViewer?.setViewSettings) {
+    currentViewSettings = normalizeViewSettings(settings);
+    return { ...currentViewSettings };
+  }
+
+  currentViewSettings = normalizeViewSettings(await window.desktopViewer.setViewSettings(settings));
+  return { ...currentViewSettings };
 }
 
 function readCameraSettings() {
-  try {
-    const rawValue = window.localStorage.getItem(CAMERA_SETTINGS_STORAGE_KEY);
-    if (!rawValue) {
-      return { ...DEFAULT_CAMERA_SETTINGS };
-    }
-
-    const parsed = JSON.parse(rawValue);
-    return {
-      autoRotate: typeof parsed?.autoRotate === "boolean" ? parsed.autoRotate : DEFAULT_CAMERA_SETTINGS.autoRotate,
-      autoRotateSpeed: Number.isFinite(parsed?.autoRotateSpeed)
-        ? parsed.autoRotateSpeed
-        : DEFAULT_CAMERA_SETTINGS.autoRotateSpeed,
-      autoRotateDelay: Number.isFinite(parsed?.autoRotateDelay)
-        ? parsed.autoRotateDelay
-        : DEFAULT_CAMERA_SETTINGS.autoRotateDelay
-    };
-  } catch (_error) {
-    return { ...DEFAULT_CAMERA_SETTINGS };
-  }
+  return { ...currentCameraSettings };
 }
 
-function writeCameraSettings(settings) {
-  window.localStorage.setItem(CAMERA_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+async function writeCameraSettings(settings) {
+  if (!window.desktopViewer?.setCameraSettings) {
+    currentCameraSettings = normalizeCameraSettings(settings);
+    return { ...currentCameraSettings };
+  }
+
+  currentCameraSettings = normalizeCameraSettings(await window.desktopViewer.setCameraSettings(settings));
+  return { ...currentCameraSettings };
+}
+
+function normalizeCameraSettings(rawSettings) {
+  const defaultCameraSettings = getDefaultCameraSettings();
+
+  return {
+    autoRotate: typeof rawSettings?.autoRotate === "boolean" ? rawSettings.autoRotate : defaultCameraSettings.autoRotate,
+    autoRotateSpeed: Number.isFinite(rawSettings?.autoRotateSpeed)
+      ? rawSettings.autoRotateSpeed
+      : defaultCameraSettings.autoRotateSpeed,
+    autoRotateDelay: Number.isFinite(rawSettings?.autoRotateDelay)
+      ? rawSettings.autoRotateDelay
+      : defaultCameraSettings.autoRotateDelay
+  };
 }
 
 function formatSettingValue(value) {
@@ -179,8 +307,8 @@ function applyViewSettings(settings) {
     return;
   }
 
-  viewer.setAttribute("environment", DEFAULT_ENVIRONMENT_SOURCE);
-  viewer.environment = DEFAULT_ENVIRONMENT_SOURCE;
+  viewer.environmentLighting = DEFAULT_ENVIRONMENT_SOURCE;
+  viewer.environmentSkybox = settings.environmentVisible ? DEFAULT_ENVIRONMENT_SOURCE : null;
 
   viewer.toneMapping = settings.toneMapping;
   viewer.exposure = settings.exposure;
@@ -188,7 +316,6 @@ function applyViewSettings(settings) {
   viewer.environmentIntensity = settings.environmentIntensity;
   viewer.environmentRotation = settings.environmentRotation;
   viewer.skyboxBlur = settings.skyboxBlur;
-  viewer.environmentVisible = settings.environmentVisible;
   viewer.setAttribute("clear-color", settings.backgroundColor);
   document.body.style.backgroundColor = settings.backgroundColor;
 }
@@ -239,18 +366,18 @@ function syncViewSettingsForm(settings) {
   skyboxBlurValue.textContent = formatSettingValue(settings.skyboxBlur);
 }
 
-function updateViewSetting(partialSettings) {
+async function updateViewSetting(partialSettings) {
   const nextSettings = normalizeViewSettings({
     ...readViewSettings(),
     ...partialSettings
   });
 
-  writeViewSettings(nextSettings);
+  await writeViewSettings(nextSettings);
   applyViewSettings(nextSettings);
   syncViewSettingsForm(nextSettings);
 }
 
-function updateCameraSettings(partialSettings) {
+async function updateCameraSettings(partialSettings) {
   const currentSettings = readCameraSettings();
   const nextSettings = {
     autoRotate:
@@ -263,7 +390,7 @@ function updateCameraSettings(partialSettings) {
       : currentSettings.autoRotateDelay
   };
 
-  writeCameraSettings(nextSettings);
+  await writeCameraSettings(nextSettings);
   applyCameraSettings(nextSettings);
   syncCameraSettingsForm(nextSettings);
 }
@@ -303,51 +430,48 @@ function attachViewSettingsControls() {
   const closeSettingsButton = document.getElementById("close-settings-button");
   const resetViewSettingsButton = document.getElementById("reset-view-settings-button");
 
-  toneMappingSelect.addEventListener("change", () => {
-    updateViewSetting({ toneMapping: toneMappingSelect.value });
+  toneMappingSelect.addEventListener("change", async () => {
+    await updateViewSetting({ toneMapping: toneMappingSelect.value });
   });
 
-  exposureRange.addEventListener("input", () => {
-    updateViewSetting({ exposure: Number(exposureRange.value) });
+  exposureRange.addEventListener("input", async () => {
+    await updateViewSetting({ exposure: Number(exposureRange.value) });
   });
 
-  contrastRange.addEventListener("input", () => {
-    updateViewSetting({ contrast: Number(contrastRange.value) });
+  contrastRange.addEventListener("input", async () => {
+    await updateViewSetting({ contrast: Number(contrastRange.value) });
   });
 
-  environmentIntensityRange.addEventListener("input", () => {
-    updateViewSetting({ environmentIntensity: Number(environmentIntensityRange.value) });
+  environmentIntensityRange.addEventListener("input", async () => {
+    await updateViewSetting({ environmentIntensity: Number(environmentIntensityRange.value) });
   });
 
-  environmentRotationRange.addEventListener("input", () => {
-    updateViewSetting({ environmentRotation: Number(environmentRotationRange.value) });
+  environmentRotationRange.addEventListener("input", async () => {
+    await updateViewSetting({ environmentRotation: Number(environmentRotationRange.value) });
   });
 
-  skyboxBlurRange.addEventListener("input", () => {
-    updateViewSetting({ skyboxBlur: Number(skyboxBlurRange.value) });
+  skyboxBlurRange.addEventListener("input", async () => {
+    await updateViewSetting({ skyboxBlur: Number(skyboxBlurRange.value) });
   });
 
-  environmentVisibleCheckbox.addEventListener("change", () => {
-    updateViewSetting({ environmentVisible: environmentVisibleCheckbox.checked });
+  environmentVisibleCheckbox.addEventListener("change", async () => {
+    await updateViewSetting({ environmentVisible: environmentVisibleCheckbox.checked });
   });
 
-  backgroundColorInput.addEventListener("input", () => {
-    updateViewSetting({ backgroundColor: backgroundColorInput.value });
+  backgroundColorInput.addEventListener("input", async () => {
+    await updateViewSetting({ backgroundColor: backgroundColorInput.value });
   });
 
   closeSettingsButton.addEventListener("click", () => {
     setPanelVisible("settings-panel", false);
   });
 
-  resetViewSettingsButton.addEventListener("click", () => {
-    writeViewSettings({ ...DEFAULT_VIEW_SETTINGS });
-    applyViewSettings(DEFAULT_VIEW_SETTINGS);
-    syncViewSettingsForm(DEFAULT_VIEW_SETTINGS);
+  resetViewSettingsButton.addEventListener("click", async () => {
+    const defaultViewSettings = { ...getDefaultViewSettings() };
+    await writeViewSettings(defaultViewSettings);
+    applyViewSettings(defaultViewSettings);
+    syncViewSettingsForm(defaultViewSettings);
   });
-
-  const initialSettings = readViewSettings();
-  applyViewSettings(initialSettings);
-  syncViewSettingsForm(initialSettings);
 }
 
 function syncCameraSettingsForm(settings) {
@@ -373,31 +497,28 @@ function attachCameraSettingsControls() {
   const closeCameraSettingsButton = document.getElementById("close-camera-settings-button");
   const resetCameraSettingsButton = document.getElementById("reset-camera-settings-button");
 
-  autoRotateCheckbox.addEventListener("change", () => {
-    updateCameraSettings({ autoRotate: autoRotateCheckbox.checked });
+  autoRotateCheckbox.addEventListener("change", async () => {
+    await updateCameraSettings({ autoRotate: autoRotateCheckbox.checked });
   });
 
-  autoRotateSpeedRange.addEventListener("input", () => {
-    updateCameraSettings({ autoRotateSpeed: Number(autoRotateSpeedRange.value) });
+  autoRotateSpeedRange.addEventListener("input", async () => {
+    await updateCameraSettings({ autoRotateSpeed: Number(autoRotateSpeedRange.value) });
   });
 
-  autoRotateDelayRange.addEventListener("input", () => {
-    updateCameraSettings({ autoRotateDelay: Number(autoRotateDelayRange.value) });
+  autoRotateDelayRange.addEventListener("input", async () => {
+    await updateCameraSettings({ autoRotateDelay: Number(autoRotateDelayRange.value) });
   });
 
   closeCameraSettingsButton.addEventListener("click", () => {
     setPanelVisible("camera-settings-panel", false);
   });
 
-  resetCameraSettingsButton.addEventListener("click", () => {
-    writeCameraSettings({ ...DEFAULT_CAMERA_SETTINGS });
-    applyCameraSettings(DEFAULT_CAMERA_SETTINGS);
-    syncCameraSettingsForm(DEFAULT_CAMERA_SETTINGS);
+  resetCameraSettingsButton.addEventListener("click", async () => {
+    const defaultCameraSettings = { ...getDefaultCameraSettings() };
+    await writeCameraSettings(defaultCameraSettings);
+    applyCameraSettings(defaultCameraSettings);
+    syncCameraSettingsForm(defaultCameraSettings);
   });
-
-  const initialSettings = readCameraSettings();
-  applyCameraSettings(initialSettings);
-  syncCameraSettingsForm(initialSettings);
 }
 
 function attachHelpPanelControls() {
@@ -411,21 +532,102 @@ function attachHelpPanelControls() {
   });
 }
 
-async function hydrateAboutPanel() {
-  const nameElement = document.getElementById("about-app-name");
-  const versionElement = document.getElementById("about-app-version");
-  const descriptionElement = document.getElementById("about-app-description");
+function renderHelpPanel() {
+  const titleElement = document.getElementById("help-panel-title");
+  const contentElement = document.getElementById("help-panel-content");
+  const helpCopy = APP_CONFIG.copy?.help;
 
-  if (!nameElement || !versionElement || !descriptionElement) {
+  if (!titleElement || !contentElement || !helpCopy) {
     return;
   }
 
+  titleElement.textContent = helpCopy.title;
+
+  const cardsHtml = helpCopy.cards
+    .map(
+      (card) => `
+        <section class="help-card">
+          <h3>${card.title}</h3>
+          ${card.bodyHtml}
+        </section>
+      `
+    )
+    .join("");
+
+  const sectionsHtml = helpCopy.sections
+    .map(
+      (section) => `
+        <section>
+          <h3>${section.title}</h3>
+          ${section.bodyHtml}
+        </section>
+      `
+    )
+    .join("");
+
+  contentElement.innerHTML = `
+    <div class="help-grid">${cardsHtml}</div>
+    ${sectionsHtml}
+  `;
+}
+
+async function hydrateAboutPanel() {
+  const aboutTitleElement = document.getElementById("about-panel-title");
+  const nameElement = document.getElementById("about-app-name");
+  const versionElement = document.getElementById("about-app-version");
+  const descriptionElement = document.getElementById("about-app-description");
+  const primaryLinksElement = document.getElementById("about-primary-links");
+  const secondaryLinksElement = document.getElementById("about-secondary-links");
+  const metaElement = document.getElementById("about-meta");
+  const aboutCopy = APP_CONFIG.copy?.about;
+
+  if (!nameElement || !versionElement || !descriptionElement || !primaryLinksElement || !secondaryLinksElement || !metaElement) {
+    return;
+  }
+
+  if (aboutTitleElement && aboutCopy?.title) {
+    aboutTitleElement.textContent = aboutCopy.title;
+  }
+
+  if (aboutCopy) {
+    primaryLinksElement.innerHTML = `
+      <a href="${APP_CONFIG.links?.website || "#"}" target="_blank" rel="noreferrer">${aboutCopy.createdByLabel}</a>
+    `;
+    secondaryLinksElement.innerHTML = `
+      <a href="${APP_CONFIG.links?.source || "#"}" target="_blank" rel="noreferrer">${aboutCopy.sourceLabel}</a>
+    `;
+    metaElement.innerHTML = aboutCopy.meta
+      .map((item) => `<p><strong>${item.label}:</strong> ${item.value}</p>`)
+      .join("");
+  }
+
   try {
-    const appInfo = await window.desktopViewer.getAppInfo();
-    nameElement.textContent = appInfo?.name || "BabylonPress 3D Viewer";
+    const appInfo = window.desktopViewer?.getAppInfo ? await window.desktopViewer.getAppInfo() : null;
+    nameElement.textContent = appInfo?.name || APP_CONFIG.productName || "BabylonPress 3D Viewer";
     versionElement.textContent = `Version ${appInfo?.version || "1.0.0"}`;
     descriptionElement.textContent =
-      appInfo?.description || "Desktop GLB viewer powered by Babylon Viewer and Electron.";
+      appInfo?.description || APP_CONFIG.description || "Desktop GLB viewer powered by Babylon Viewer and Electron.";
+
+    if (appInfo?.viewerVersion) {
+      const viewerVersionHtml = `<p><strong>Babylon Viewer:</strong> ${appInfo.viewerVersion}</p>`;
+      if (!metaElement.innerHTML.includes("Babylon Viewer:")) {
+        metaElement.innerHTML += viewerVersionHtml;
+      }
+    }
+
+    if (appInfo?.electronVersion) {
+      const electronVersionHtml = `<p><strong>Electron:</strong> ${appInfo.electronVersion}</p>`;
+      if (!metaElement.innerHTML.includes("Electron:")) {
+        metaElement.innerHTML += electronVersionHtml;
+      }
+    }
+
+    if (appInfo?.buildVersion) {
+      const buildVersionHtml = `<p><strong>Build:</strong> ${appInfo.buildVersion}</p>`;
+      if (!metaElement.innerHTML.includes("Build:")) {
+        metaElement.innerHTML += buildVersionHtml;
+      }
+    }
   } catch (_error) {
     versionElement.textContent = "Version";
   }
@@ -444,7 +646,7 @@ function attachAboutPanelControls() {
   const aboutPanel = document.getElementById("about-panel");
   aboutPanel?.addEventListener("click", async (event) => {
     const targetLink = event.target.closest("a[href]");
-    if (!targetLink) {
+    if (!targetLink || !window.desktopViewer?.openExternalUrl) {
       return;
     }
 
@@ -457,23 +659,122 @@ attachViewSettingsControls();
 attachCameraSettingsControls();
 attachHelpPanelControls();
 attachAboutPanelControls();
+renderEmptyStateCopy();
+renderSettingsPanelCopy();
+renderHelpPanel();
 hydrateAboutPanel();
 
-window.desktopViewer.onToggleViewSettings(() => {
-  togglePanel("settings-panel", ["camera-settings-panel", "help-panel", "about-panel"]);
-});
+async function initializeSettings() {
+  if (window.desktopViewer?.getAppConfig) {
+    try {
+      const remoteConfig = await window.desktopViewer.getAppConfig();
+      if (remoteConfig && typeof remoteConfig === "object") {
+        APP_CONFIG = {
+          ...FALLBACK_APP_CONFIG,
+          ...remoteConfig,
+          links: {
+            ...FALLBACK_APP_CONFIG.links,
+            ...remoteConfig.links
+          },
+          defaults: {
+            ...FALLBACK_APP_CONFIG.defaults,
+            ...remoteConfig.defaults,
+            viewSettings: {
+              ...FALLBACK_APP_CONFIG.defaults.viewSettings,
+              ...remoteConfig.defaults?.viewSettings
+            },
+            cameraSettings: {
+              ...FALLBACK_APP_CONFIG.defaults.cameraSettings,
+              ...remoteConfig.defaults?.cameraSettings
+            }
+          },
+          copy: {
+            ...FALLBACK_APP_CONFIG.copy,
+            ...remoteConfig.copy,
+            viewPanel: {
+              ...FALLBACK_APP_CONFIG.copy.viewPanel,
+              ...remoteConfig.copy?.viewPanel,
+              fields: {
+                ...FALLBACK_APP_CONFIG.copy.viewPanel.fields,
+                ...remoteConfig.copy?.viewPanel?.fields,
+                toneMappingOptions: {
+                  ...FALLBACK_APP_CONFIG.copy.viewPanel.fields.toneMappingOptions,
+                  ...remoteConfig.copy?.viewPanel?.fields?.toneMappingOptions
+                }
+              }
+            },
+            cameraPanel: {
+              ...FALLBACK_APP_CONFIG.copy.cameraPanel,
+              ...remoteConfig.copy?.cameraPanel,
+              fields: {
+                ...FALLBACK_APP_CONFIG.copy.cameraPanel.fields,
+                ...remoteConfig.copy?.cameraPanel?.fields
+              }
+            },
+            help: {
+              ...FALLBACK_APP_CONFIG.copy.help,
+              ...remoteConfig.copy?.help
+            },
+            about: {
+              ...FALLBACK_APP_CONFIG.copy.about,
+              ...remoteConfig.copy?.about
+            }
+          }
+        };
+      }
+    } catch (_error) {
+      APP_CONFIG = FALLBACK_APP_CONFIG;
+    }
+  }
 
-window.desktopViewer.onToggleCameraSettings(() => {
-  togglePanel("camera-settings-panel", ["settings-panel", "help-panel", "about-panel"]);
-});
+  renderEmptyStateCopy();
+  renderSettingsPanelCopy();
+  renderHelpPanel();
+  await hydrateAboutPanel();
 
-window.desktopViewer.onToggleHelpPanel(() => {
-  togglePanel("help-panel", ["settings-panel", "camera-settings-panel", "about-panel"]);
-});
+  if (window.desktopViewer?.getViewSettings) {
+    currentViewSettings = normalizeViewSettings(await window.desktopViewer.getViewSettings());
+  } else {
+    currentViewSettings = normalizeViewSettings(currentViewSettings);
+  }
 
-window.desktopViewer.onToggleAboutPanel(() => {
-  togglePanel("about-panel", ["settings-panel", "camera-settings-panel", "help-panel"]);
-});
+  if (window.desktopViewer?.getCameraSettings) {
+    currentCameraSettings = normalizeCameraSettings(await window.desktopViewer.getCameraSettings());
+  } else {
+    currentCameraSettings = normalizeCameraSettings(currentCameraSettings);
+  }
+
+  applyViewSettings(currentViewSettings);
+  syncViewSettingsForm(currentViewSettings);
+  applyCameraSettings(currentCameraSettings);
+  syncCameraSettingsForm(currentCameraSettings);
+}
+
+initializeSettings();
+
+if (window.desktopViewer?.onToggleViewSettings) {
+  window.desktopViewer.onToggleViewSettings(() => {
+    togglePanel("settings-panel", ["camera-settings-panel", "help-panel", "about-panel"]);
+  });
+}
+
+if (window.desktopViewer?.onToggleCameraSettings) {
+  window.desktopViewer.onToggleCameraSettings(() => {
+    togglePanel("camera-settings-panel", ["settings-panel", "help-panel", "about-panel"]);
+  });
+}
+
+if (window.desktopViewer?.onToggleHelpPanel) {
+  window.desktopViewer.onToggleHelpPanel(() => {
+    togglePanel("help-panel", ["settings-panel", "camera-settings-panel", "about-panel"]);
+  });
+}
+
+if (window.desktopViewer?.onToggleAboutPanel) {
+  window.desktopViewer.onToggleAboutPanel(() => {
+    togglePanel("about-panel", ["settings-panel", "camera-settings-panel", "help-panel"]);
+  });
+}
 
 function isGlbFile(file) {
   return Boolean(file?.name && file.name.toLowerCase().endsWith(".glb"));
@@ -516,7 +817,9 @@ window.addEventListener("drop", async (event) => {
   }
 
   setStatusMessage("");
-  await window.desktopViewer.rememberFile(file.path);
+  if (window.desktopViewer?.rememberFile) {
+    await window.desktopViewer.rememberFile(file.path);
+  }
   loadModel(file.path);
 });
 
@@ -524,7 +827,7 @@ window.addEventListener("keydown", async (event) => {
   const isOpenShortcut = (event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey;
   if (isOpenShortcut && event.key.toLowerCase() === "o") {
     event.preventDefault();
-    const filePath = await window.desktopViewer.openDialog();
+    const filePath = window.desktopViewer?.openDialog ? await window.desktopViewer.openDialog() : null;
     if (filePath) {
       loadModel(filePath);
     }

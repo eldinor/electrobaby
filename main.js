@@ -1,12 +1,27 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain, nativeImage, shell } = require("electron");
 const fs = require("fs");
 const path = require("path");
+const { APP_CONFIG } = require("./app-config");
 
-const MAX_RECENT_FILES = 10;
-const MAX_RECENT_FOLDERS = 10;
-const APP_ICON_PATH = path.join(__dirname, process.platform === "win32" ? "bplogo.ico" : "bplogo.svg");
+const MAX_RECENT_FILES = APP_CONFIG.recent.maxFiles;
+const MAX_RECENT_FOLDERS = APP_CONFIG.recent.maxFolders;
+const APP_ICON_PATH = path.join(
+  __dirname,
+  process.platform === "win32" ? APP_CONFIG.files.iconWindows : APP_CONFIG.files.iconDefault
+);
+const DEFAULT_VIEW_SETTINGS = APP_CONFIG.defaults.viewSettings;
+const DEFAULT_CAMERA_SETTINGS = APP_CONFIG.defaults.cameraSettings;
+const BABYLON_VIEWER_VERSION = getBabylonViewerVersion();
 let mainWindow = null;
 let pendingFileToOpen = getFilePathFromArgv(process.argv);
+
+function getBabylonViewerVersion() {
+  try {
+    return require("@babylonjs/viewer/package.json").version;
+  } catch (_error) {
+    return APP_CONFIG.packageVersions?.babylonViewer || null;
+  }
+}
 
 function getRecentStorePath() {
   return path.join(app.getPath("userData"), "recent-files.json");
@@ -26,6 +41,41 @@ function normalizeExistingFile(filePath) {
   return typeof filePath === "string" && fs.existsSync(filePath) && fs.statSync(filePath).isFile()
     ? filePath
     : null;
+}
+
+function normalizeViewSettings(rawSettings) {
+  return {
+    toneMapping: typeof rawSettings?.toneMapping === "string" ? rawSettings.toneMapping : DEFAULT_VIEW_SETTINGS.toneMapping,
+    exposure: Number.isFinite(rawSettings?.exposure) ? rawSettings.exposure : DEFAULT_VIEW_SETTINGS.exposure,
+    contrast: Number.isFinite(rawSettings?.contrast) ? rawSettings.contrast : DEFAULT_VIEW_SETTINGS.contrast,
+    environmentIntensity: Number.isFinite(rawSettings?.environmentIntensity)
+      ? rawSettings.environmentIntensity
+      : DEFAULT_VIEW_SETTINGS.environmentIntensity,
+    environmentRotation: Number.isFinite(rawSettings?.environmentRotation)
+      ? rawSettings.environmentRotation
+      : DEFAULT_VIEW_SETTINGS.environmentRotation,
+    skyboxBlur: Number.isFinite(rawSettings?.skyboxBlur) ? rawSettings.skyboxBlur : DEFAULT_VIEW_SETTINGS.skyboxBlur,
+    environmentVisible:
+      typeof rawSettings?.environmentVisible === "boolean"
+        ? rawSettings.environmentVisible
+        : DEFAULT_VIEW_SETTINGS.environmentVisible,
+    backgroundColor:
+      typeof rawSettings?.backgroundColor === "string" && /^#[0-9a-fA-F]{6}$/.test(rawSettings.backgroundColor)
+        ? rawSettings.backgroundColor
+        : DEFAULT_VIEW_SETTINGS.backgroundColor
+  };
+}
+
+function normalizeCameraSettings(rawSettings) {
+  return {
+    autoRotate: typeof rawSettings?.autoRotate === "boolean" ? rawSettings.autoRotate : DEFAULT_CAMERA_SETTINGS.autoRotate,
+    autoRotateSpeed: Number.isFinite(rawSettings?.autoRotateSpeed)
+      ? rawSettings.autoRotateSpeed
+      : DEFAULT_CAMERA_SETTINGS.autoRotateSpeed,
+    autoRotateDelay: Number.isFinite(rawSettings?.autoRotateDelay)
+      ? rawSettings.autoRotateDelay
+      : DEFAULT_CAMERA_SETTINGS.autoRotateDelay
+  };
 }
 
 function readRecentFiles() {
@@ -62,7 +112,9 @@ function readPreferences() {
       return {
         reopenLastOnStartup: false,
         recentFolders: [],
-        lastOpenDirectory: null
+        lastOpenDirectory: null,
+        viewSettings: { ...DEFAULT_VIEW_SETTINGS },
+        cameraSettings: { ...DEFAULT_CAMERA_SETTINGS }
       };
     }
 
@@ -72,14 +124,18 @@ function readPreferences() {
       recentFolders: Array.isArray(parsed?.recentFolders)
         ? parsed.recentFolders.map(normalizeExistingDirectory).filter(Boolean).slice(0, MAX_RECENT_FOLDERS)
         : [],
-      lastOpenDirectory: normalizeExistingDirectory(parsed?.lastOpenDirectory)
+      lastOpenDirectory: normalizeExistingDirectory(parsed?.lastOpenDirectory),
+      viewSettings: normalizeViewSettings(parsed?.viewSettings),
+      cameraSettings: normalizeCameraSettings(parsed?.cameraSettings)
     };
   } catch (error) {
     console.error("Failed to read preferences:", error);
     return {
       reopenLastOnStartup: false,
       recentFolders: [],
-      lastOpenDirectory: null
+      lastOpenDirectory: null,
+      viewSettings: { ...DEFAULT_VIEW_SETTINGS },
+      cameraSettings: { ...DEFAULT_CAMERA_SETTINGS }
     };
   }
 }
@@ -116,6 +172,17 @@ function addRecentFile(filePath) {
 
 function clearRecentFiles() {
   writeRecentFiles([]);
+  createAppMenu();
+}
+
+function clearAllRecents() {
+  const preferences = readPreferences();
+  writeRecentFiles([]);
+  writePreferences({
+    ...preferences,
+    recentFolders: [],
+    lastOpenDirectory: null
+  });
   createAppMenu();
 }
 
@@ -159,10 +226,10 @@ function sendFileToRenderer(filePath) {
 
 async function showOpenDialog(targetWindow = mainWindow, directoryPath = getDefaultOpenDirectory()) {
   const result = await dialog.showOpenDialog(targetWindow, {
-    title: "Open GLB file",
+    title: APP_CONFIG.ui.openModelDialogTitle,
     defaultPath: directoryPath,
     properties: ["openFile"],
-    filters: [{ name: "3D Models", extensions: ["glb"] }]
+    filters: [{ name: APP_CONFIG.ui.modelFilterName, extensions: APP_CONFIG.files.modelExtensions }]
   });
 
   if (result.canceled || !result.filePaths?.length) {
@@ -268,6 +335,11 @@ function createAppMenu() {
           submenu: createRecentFoldersSubmenu()
         },
         {
+          label: "Clear All Recents",
+          click: () => clearAllRecents()
+        },
+        { type: "separator" },
+        {
           label: "Reopen Last On Startup",
           type: "checkbox",
           checked: preferences.reopenLastOnStartup,
@@ -322,7 +394,7 @@ function createAppMenu() {
           }
         },
         {
-          label: "About BabylonPress 3D Viewer",
+          label: APP_CONFIG.ui.aboutMenuLabel,
           click: () => {
             mainWindow?.webContents.send("toggle-about-panel");
           }
@@ -473,9 +545,12 @@ ipcMain.handle("remember-file", async (_event, filePath) => {
 
 ipcMain.handle("get-app-info", async () => {
   return {
-    name: "BabylonPress 3D Viewer",
+    name: APP_CONFIG.productName,
     version: app.getVersion(),
-    description: "Desktop GLB viewer powered by Babylon Viewer and Electron."
+    description: APP_CONFIG.description,
+    viewerVersion: BABYLON_VIEWER_VERSION,
+    electronVersion: process.versions.electron,
+    buildVersion: app.getVersion()
   };
 });
 
@@ -486,4 +561,36 @@ ipcMain.handle("open-external-url", async (_event, url) => {
 
   await shell.openExternal(url);
   return true;
+});
+
+ipcMain.handle("get-app-config", async () => {
+  return APP_CONFIG;
+});
+
+ipcMain.handle("get-view-settings", async () => {
+  return readPreferences().viewSettings;
+});
+
+ipcMain.handle("set-view-settings", async (_event, settings) => {
+  const preferences = readPreferences();
+  const nextSettings = normalizeViewSettings(settings);
+  writePreferences({
+    ...preferences,
+    viewSettings: nextSettings
+  });
+  return nextSettings;
+});
+
+ipcMain.handle("get-camera-settings", async () => {
+  return readPreferences().cameraSettings;
+});
+
+ipcMain.handle("set-camera-settings", async (_event, settings) => {
+  const preferences = readPreferences();
+  const nextSettings = normalizeCameraSettings(settings);
+  writePreferences({
+    ...preferences,
+    cameraSettings: nextSettings
+  });
+  return nextSettings;
 });

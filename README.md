@@ -57,23 +57,20 @@ Build output is generated in `dist/`.
 - `Ctrl+Cmd+F`: Toggle fullscreen on macOS
 - `Esc`: Close open panels
 
-## Project Files
-
-- [main.js](/c:/Users/Fiolent23/newrepos/winbab/main.js): Electron main process, menus, recent files, file opening, packaging-side behavior
-- [preload.js](/c:/Users/Fiolent23/newrepos/winbab/preload.js): safe bridge between Electron and the renderer
-- [renderer.js](/c:/Users/Fiolent23/newrepos/winbab/renderer.js): viewer loading, panel behavior, settings, drag-and-drop
-- [index.html](/c:/Users/Fiolent23/newrepos/winbab/index.html): UI shell and in-app panels
-- [TODO.md](/c:/Users/Fiolent23/newrepos/winbab/TODO.md): backlog and future improvements
-
 ## GitHub Releases
-
-This project does not need to be published to npm.
 
 You can distribute desktop builds through GitHub Releases by:
 
 1. Running `npm run dist`
 2. Taking the generated files from `dist/`
 3. Uploading them as release assets on GitHub
+
+## Current Limitations
+
+- Windows is the only packaging target currently configured.
+- macOS packaging is not set up yet.
+- Linux packaging is not set up yet.
+- The app is focused on `.glb` viewing only.
 
 ## Notes
 
