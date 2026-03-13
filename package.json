@@ -1,10 +1,14 @@
 {
   "name": "electrobaby",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "productName": "BabylonPress GLB Viewer",
   "license": "Apache-2.0",
   "description": "BabylonPress GLB Viewer is a desktop GLB viewer powered by Babylon Viewer and Electron.",
-  "author": "BabylonPress",
+  "author": {
+    "name": "Andrei Stepanov",
+    "email": "eldinor@gmail.com",
+    "url": "https://babylonpress.org/"
+  },
   "main": "main.js",
   "homepage": "https://github.com/eldinor/electrobaby",
   "repository": {
