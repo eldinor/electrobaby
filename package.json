@@ -1,0 +1,38 @@
+{
+  "name": "electrobaby",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "description": "ElectroBaby  - BabylonPress desktop GLB viewer powered by Babylon Viewer and Electron.",
+  "main": "main.js",
+  "scripts": {
+    "start": "powershell -Command \"Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue; electron .\"",
+    "dist": "electron-builder --win"
+  },
+  "dependencies": {
+    "@babylonjs/viewer": "^7.0.0"
+  },
+  "devDependencies": {
+    "electron": "^30.5.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.winbab.viewer",
+    "productName": "BabylonPress 3D Viewer",
+    "files": [
+      "**/*",
+      "!dist/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "bplogo.ico"
+    },
+    "fileAssociations": [
+      {
+        "ext": "glb",
+        "name": "GLB Model",
+        "description": "GLB 3D Model",
+        "role": "Viewer"
+      }
+    ]
+  }
+}

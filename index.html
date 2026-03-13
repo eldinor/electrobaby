@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BabylonPress GLB Viewer</title>
+  <script type="module">
+    import "./node_modules/@babylonjs/viewer/dist/babylon-viewer.esm.js";
+  </script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1e1e1e;
+      font-family: sans-serif;
+    }
+
+    babylon-viewer {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #empty-state {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 160ms ease;
+    }
+
+    #empty-state.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #status-banner {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: min(680px, calc(100vw - 32px));
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 120, 120, 0.4);
+      border-radius: 12px;
+      background: rgba(74, 18, 18, 0.92);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+      color: #ffe5e5;
+      font-size: 14px;
+      line-height: 1.4;
+      z-index: 20;
+    }
+
+    #status-banner.hidden {
+      display: none;
+    }
+
+    .empty-card {
+      max-width: 520px;
+      padding: 28px 32px;
+      border: 1px solid rgba(124, 196, 255, 0.28);
+      border-radius: 18px;
+      background: rgba(20, 26, 33, 0.86);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      text-align: center;
+      color: #e8f3fb;
+      backdrop-filter: blur(8px);
+      line-height: 2rem;
+    }
+
+    .empty-card h1 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: #b8cad8;
+    }
+
+    .empty-card p {
+      margin: 0;
+      color: #b8cad8;
+      font-size: 15px;
+      line-height: 2;
+    }
+
+    .empty-card kbd {
+      padding: 2px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      font: inherit;
+      color: #ffffff;
+    }
+
+    #settings-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: min(360px, calc(100vw - 40px));
+      max-height: calc(100vh - 40px);
+      padding: 20px;
+      border: 1px solid rgba(124, 196, 255, 0.24);
+      border-radius: 18px;
+      background: rgba(16, 21, 28, 0.94);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+      color: #e8f3fb;
+      overflow: auto;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }
+
+    #settings-panel.hidden,
+    #camera-settings-panel.hidden,
+    #help-panel.hidden,
+    #about-panel.hidden {
+      display: none;
+    }
+
+    #camera-settings-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: min(360px, calc(100vw - 40px));
+      max-height: calc(100vh - 40px);
+      padding: 20px;
+      border: 1px solid rgba(124, 196, 255, 0.24);
+      border-radius: 18px;
+      background: rgba(16, 21, 28, 0.94);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+      color: #e8f3fb;
+      overflow: auto;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }
+
+    #help-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: min(720px, calc(100vw - 40px));
+      max-height: calc(100vh - 40px);
+      padding: 22px;
+      border: 1px solid rgba(124, 196, 255, 0.24);
+      border-radius: 18px;
+      background: rgba(16, 21, 28, 0.96);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+      color: #e8f3fb;
+      overflow: auto;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }
+
+    #about-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: min(420px, calc(100vw - 40px));
+      max-height: calc(100vh - 40px);
+      padding: 22px;
+      border: 1px solid rgba(124, 196, 255, 0.24);
+      border-radius: 18px;
+      background: rgba(16, 21, 28, 0.96);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.38);
+      color: #e8f3fb;
+      overflow: auto;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }
+
+    .about-copy {
+      display: grid;
+      gap: 16px;
+    }
+
+    .about-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .about-brand img {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: rgba(124, 196, 255, 0.1);
+      padding: 8px;
+    }
+
+    .about-brand h3 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      color: #f4fbff;
+    }
+
+    .about-brand p,
+    .about-copy p,
+    .about-copy li {
+      margin: 0;
+      color: #b8cad8;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .about-meta {
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px;
+      border: 1px solid rgba(124, 196, 255, 0.16);
+      border-radius: 14px;
+      background: rgba(124, 196, 255, 0.08);
+    }
+
+    .about-meta strong {
+      color: #f4fbff;
+    }
+
+    .about-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .about-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border: 1px solid rgba(124, 196, 255, 0.22);
+      border-radius: 10px;
+      background: rgba(124, 196, 255, 0.1);
+      color: #f4fbff;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .about-links a:hover {
+      background: rgba(124, 196, 255, 0.16);
+    }
+
+    .help-copy {
+      display: grid;
+      gap: 18px;
+    }
+
+    .help-copy h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      font-weight: 600;
+      color: #f4fbff;
+    }
+
+    .help-copy p,
+    .help-copy li {
+      margin: 0;
+      color: #b8cad8;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .help-copy ul,
+    .help-copy ol {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+
+    .help-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .help-card {
+      padding: 16px;
+      border: 1px solid rgba(124, 196, 255, 0.16);
+      border-radius: 14px;
+      background: rgba(124, 196, 255, 0.08);
+    }
+
+    @media (max-width: 760px) {
+      .help-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .settings-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 500;
+      color: #f4fbff;
+    }
+
+    .settings-header button {
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #f4fbff;
+      cursor: pointer;
+      padding: 8px 12px;
+    }
+
+    .settings-group {
+      margin-bottom: 18px;
+    }
+
+    .settings-group label,
+    .settings-group legend {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #b8cad8;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .settings-group input,
+    .settings-group select {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .settings-group input[type="range"] {
+      accent-color: #7cc4ff;
+    }
+
+    .settings-group output {
+      display: block;
+      margin-top: 6px;
+      color: #f4fbff;
+      font-size: 13px;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .settings-row input[type="checkbox"] {
+      width: auto;
+      transform: scale(1.15);
+    }
+
+    .settings-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .settings-actions button {
+      border: 1px solid rgba(124, 196, 255, 0.28);
+      border-radius: 10px;
+      background: rgba(124, 196, 255, 0.12);
+      color: #f4fbff;
+      cursor: pointer;
+      padding: 10px 14px;
+    }
+
+    body.drag-over {
+      outline: 3px dashed #7cc4ff;
+      outline-offset: -12px;
+      background: #263238;
+    }
+  </style>
+</head>
+<body>
+  <div id="status-banner" class="hidden" role="status" aria-live="polite"></div>
+  <div id="empty-state">
+    <div class="empty-card">
+      <h1>Drop a GLB file to begin</h1>
+      <p>Drag a <kbd>.glb</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model</p>
+    </div>
+  </div>
+  <aside id="settings-panel" class="hidden" aria-label="View settings">
+    <div class="settings-header">
+      <h2>View Settings</h2>
+      <button id="close-settings-button" type="button">Close</button>
+    </div>
+    <div class="settings-group">
+      <label for="tone-mapping-select">Tone Mapping</label>
+      <select id="tone-mapping-select">
+        <option value="standard">Standard</option>
+        <option value="aces">ACES</option>
+        <option value="neutral">Neutral</option>
+        <option value="none">None</option>
+      </select>
+    </div>
+    <div class="settings-group">
+      <label for="exposure-range">Exposure</label>
+      <input id="exposure-range" type="range" min="0.5" max="2" step="0.05" />
+      <output id="exposure-value" for="exposure-range"></output>
+    </div>
+    <div class="settings-group">
+      <label for="contrast-range">Contrast</label>
+      <input id="contrast-range" type="range" min="0.5" max="2" step="0.05" />
+      <output id="contrast-value" for="contrast-range"></output>
+    </div>
+    <div class="settings-group">
+      <label for="environment-intensity-range">Environment Intensity</label>
+      <input id="environment-intensity-range" type="range" min="0" max="2" step="0.05" />
+      <output id="environment-intensity-value" for="environment-intensity-range"></output>
+    </div>
+    <div class="settings-group">
+      <label for="environment-rotation-range">Environment Rotation</label>
+      <input id="environment-rotation-range" type="range" min="0" max="6.28" step="0.01" />
+      <output id="environment-rotation-value" for="environment-rotation-range"></output>
+    </div>
+    <div class="settings-group">
+      <label for="skybox-blur-range">Skybox Blur</label>
+      <input id="skybox-blur-range" type="range" min="0" max="1" step="0.01" />
+      <output id="skybox-blur-value" for="skybox-blur-range"></output>
+    </div>
+    <div class="settings-group">
+      <div class="settings-row">
+        <label for="environment-visible-checkbox">Show Environment</label>
+        <input id="environment-visible-checkbox" type="checkbox" />
+      </div>
+    </div>
+    <div class="settings-group">
+      <label for="background-color-input">Background Color</label>
+      <input id="background-color-input" type="color" value="#1e1e1e" />
+    </div>
+    <div class="settings-actions">
+      <button id="reset-view-settings-button" type="button">Reset View Settings</button>
+    </div>
+  </aside>
+  <aside id="camera-settings-panel" class="hidden" aria-label="Camera settings">
+    <div class="settings-header">
+      <h2>Camera Settings</h2>
+      <button id="close-camera-settings-button" type="button">Close</button>
+    </div>
+    <div class="settings-group">
+      <div class="settings-row">
+        <label for="camera-auto-rotate-checkbox">Auto Rotate</label>
+        <input id="camera-auto-rotate-checkbox" type="checkbox" />
+      </div>
+    </div>
+    <div class="settings-group">
+      <label for="camera-auto-rotate-speed-range">Auto Rotate Speed</label>
+      <input id="camera-auto-rotate-speed-range" type="range" min="0.1" max="4" step="0.1" />
+      <output id="camera-auto-rotate-speed-value" for="camera-auto-rotate-speed-range"></output>
+    </div>
+    <div class="settings-group">
+      <label for="camera-auto-rotate-delay-range">Auto Rotate Delay</label>
+      <input id="camera-auto-rotate-delay-range" type="range" min="0" max="5000" step="100" />
+      <output id="camera-auto-rotate-delay-value" for="camera-auto-rotate-delay-range"></output>
+    </div>
+    <div class="settings-actions">
+      <button id="reset-camera-settings-button" type="button">Reset Camera Settings</button>
+    </div>
+  </aside>
+  <aside id="help-panel" class="hidden" aria-label="User guide">
+    <div class="settings-header">
+      <h2>User Guide</h2>
+      <button id="close-help-panel-button" type="button">Close</button>
+    </div>
+    <div class="help-copy">
+      <div class="help-grid">
+        <section class="help-card">
+          <h3>Open a Model</h3>
+          <ol>
+            <li>Choose <kbd>File</kbd> -> <kbd>Open...</kbd>.</li>
+            <li>Select a valid <kbd>.glb</kbd> file.</li>
+            <li>The model will load in the viewer.</li>
+          </ol>
+        </section>
+        <section class="help-card">
+          <h3>Drag and Drop</h3>
+          <p>Drop a <kbd>.glb</kbd> file directly into the window to open it.</p>
+          <p>If the file is invalid, the status banner will explain that the file should be checked.</p>
+        </section>
+        <section class="help-card">
+          <h3>Recent Items</h3>
+          <ul>
+            <li><kbd>File</kbd> -> <kbd>Open Recent</kbd></li>
+            <li><kbd>File</kbd> -> <kbd>Open Recent Folder</kbd></li>
+            <li><kbd>File</kbd> -> <kbd>Reopen Last On Startup</kbd></li>
+          </ul>
+        </section>
+        <section class="help-card">
+          <h3>Shortcuts</h3>
+          <ul>
+            <li><kbd>Ctrl+O</kbd> / <kbd>Cmd+O</kbd>: Open model</li>
+            <li><kbd>F1</kbd>: Open Help</li>
+            <li><kbd>F11</kbd>: Fullscreen on Windows/Linux</li>
+            <li><kbd>Esc</kbd>: Close open panels</li>
+          </ul>
+        </section>
+      </div>
+      <section>
+        <h3>View Settings</h3>
+        <p>Open <kbd>Settings</kbd> -> <kbd>View...</kbd> to adjust tone mapping, exposure, contrast, environment intensity, environment rotation, skybox blur, environment visibility, and background color.</p>
+      </section>
+      <section>
+        <h3>Camera Settings</h3>
+        <p>Open <kbd>Settings</kbd> -> <kbd>Camera...</kbd> to control auto rotate, auto rotate speed, and auto rotate delay.</p>
+      </section>
+      <section>
+        <h3>Troubleshooting</h3>
+        <ul>
+          <li>If a model does not load, confirm that the file is a valid <kbd>.glb</kbd>.</li>
+          <li>If the scene looks too dark, enable <kbd>Show Environment</kbd> in <kbd>Settings</kbd> -> <kbd>View...</kbd>.</li>
+        </ul>
+      </section>
+    </div>
+  </aside>
+  <aside id="about-panel" class="hidden" aria-label="About BabylonPress 3D Viewer">
+    <div class="settings-header">
+      <h2>About</h2>
+      <button id="close-about-panel-button" type="button">Close</button>
+    </div>
+    <div class="about-copy">
+      <div class="about-brand">
+        <img src="./bplogo.svg" alt="BabylonPress logo" />
+      <div>
+          <h3 id="about-app-name">BabylonPress 3D Viewer</h3>
+          <p id="about-app-version">Version</p>
+        </div>
+      </div>
+      <p id="about-app-description">Desktop GLB viewer powered by Babylon Viewer and Electron.</p>
+      <div class="about-links">
+        <a href="https://babylonpress.org/" target="_blank" rel="noreferrer">Created by BabylonPress.org</a>
+      </div>
+      <div class="about-meta">
+        <p><strong>Supported format:</strong> GLB</p>
+        <p><strong>Main actions:</strong> Open, drag-and-drop, recent files, view settings, camera settings</p>
+        <p><strong>Help shortcut:</strong> F1</p>
+      </div>
+      <div class="about-links">
+        <a href="https://example.com/source" target="_blank" rel="noreferrer">Source</a>
+      </div>
+    </div>
+  </aside>
+  <babylon-viewer id="viewer"></babylon-viewer>
+  <script src="./renderer.js"></script>
+</body>
+</html>

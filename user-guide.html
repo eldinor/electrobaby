@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BabylonPress 3D Viewer - User Guide</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10151c;
+      --panel: #17202a;
+      --panel-border: rgba(124, 196, 255, 0.18);
+      --text: #edf5fb;
+      --muted: #b7c7d5;
+      --accent: #7cc4ff;
+      --accent-soft: rgba(124, 196, 255, 0.14);
+      --danger-soft: rgba(255, 120, 120, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(124, 196, 255, 0.12), transparent 35%),
+        linear-gradient(180deg, #0f151c 0%, #10151c 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    main {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+
+    h1,
+    h2 {
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 34px;
+      font-weight: 600;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-top: 28px;
+    }
+
+    p,
+    li {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      background: rgba(23, 32, 42, 0.88);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      padding: 28px;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      max-width: 700px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .shortcut-list,
+    .steps,
+    .tips {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    code,
+    kbd {
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--text);
+      padding: 2px 7px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.95em;
+    }
+
+    .warning {
+      margin-top: 22px;
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 120, 120, 0.22);
+      border-radius: 14px;
+      background: var(--danger-soft);
+    }
+
+    .warning strong {
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>BabylonPress 3D Viewer User Guide</h1>
+      <p>
+        BabylonPress 3D Viewer is a desktop app for opening and inspecting <code>.glb</code> models.
+        It supports drag-and-drop, recent files, visual view settings, and camera auto-rotate controls.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>Open a Model</h2>
+        <ol class="steps">
+          <li>Choose <kbd>File</kbd> -> <kbd>Open...</kbd>.</li>
+          <li>Select a valid <code>.glb</code> file.</li>
+          <li>The model will load in the main viewer window.</li>
+        </ol>
+        <p>You can also press <kbd>Ctrl+O</kbd> on Windows or <kbd>Cmd+O</kbd> on macOS.</p>
+      </article>
+
+      <article class="panel">
+        <h2>Drag and Drop</h2>
+        <p>Drop a <code>.glb</code> file directly into the viewer window to open it.</p>
+        <p>If the file is not a valid GLB, the app will show an error message and suggest checking the file.</p>
+      </article>
+
+      <article class="panel">
+        <h2>Recent Files</h2>
+        <p>Use these menu items to reopen work quickly:</p>
+        <ul class="tips">
+          <li><kbd>File</kbd> -> <kbd>Open Recent</kbd></li>
+          <li><kbd>File</kbd> -> <kbd>Open Recent Folder</kbd></li>
+          <li><kbd>File</kbd> -> <kbd>Reopen Last On Startup</kbd></li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>View Settings</h2>
+        <p>Open <kbd>Settings</kbd> -> <kbd>View...</kbd> to adjust the presentation of the scene.</p>
+        <ul class="tips">
+          <li>Tone mapping</li>
+          <li>Exposure</li>
+          <li>Contrast</li>
+          <li>Environment intensity</li>
+          <li>Environment rotation</li>
+          <li>Skybox blur</li>
+          <li>Show environment</li>
+          <li>Background color</li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>Camera Settings</h2>
+        <p>Open <kbd>Settings</kbd> -> <kbd>Camera...</kbd> to control idle orbit behavior.</p>
+        <ul class="tips">
+          <li>Auto Rotate</li>
+          <li>Auto Rotate Speed</li>
+          <li>Auto Rotate Delay</li>
+        </ul>
+      </article>
+
+      <article class="panel">
+        <h2>Helpful Shortcuts</h2>
+        <ul class="shortcut-list">
+          <li><kbd>F1</kbd>: Open this user guide</li>
+          <li><kbd>F11</kbd>: Toggle fullscreen on Windows/Linux</li>
+          <li><kbd>Ctrl+Cmd+F</kbd>: Toggle fullscreen on macOS</li>
+          <li><kbd>Esc</kbd>: Close open settings panels</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="warning">
+      <strong>Troubleshooting:</strong>
+      If a model does not load, first confirm that the file is a valid <code>.glb</code>. If the screen looks too dark,
+      make sure the environment is enabled in <kbd>Settings</kbd> -> <kbd>View...</kbd>.
+    </section>
+  </main>
+</body>
+</html>
