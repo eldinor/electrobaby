@@ -816,11 +816,17 @@ window.addEventListener("drop", async (event) => {
     return;
   }
 
+  const filePath = window.desktopViewer?.getPathForFile ? window.desktopViewer.getPathForFile(file) : file?.path;
+  if (!filePath) {
+    setStatusMessage("The dropped file could not be opened.");
+    return;
+  }
+
   setStatusMessage("");
   if (window.desktopViewer?.rememberFile) {
-    await window.desktopViewer.rememberFile(file.path);
+    await window.desktopViewer.rememberFile(filePath);
   }
-  loadModel(file.path);
+  loadModel(filePath);
 });
 
 window.addEventListener("keydown", async (event) => {

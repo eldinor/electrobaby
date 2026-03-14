@@ -544,13 +544,18 @@ ipcMain.handle("remember-file", async (_event, filePath) => {
 });
 
 ipcMain.handle("get-app-info", async () => {
+  const buildVersion =
+    typeof app.getBuildVersion === "function"
+      ? app.getBuildVersion() || app.getVersion()
+      : app.getVersion();
+
   return {
     name: APP_CONFIG.productName,
     version: app.getVersion(),
     description: APP_CONFIG.description,
     viewerVersion: BABYLON_VIEWER_VERSION,
     electronVersion: process.versions.electron,
-    buildVersion: app.getVersion()
+    buildVersion
   };
 });
 

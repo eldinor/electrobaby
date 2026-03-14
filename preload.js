@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge, ipcRenderer, webUtils } = require("electron");
 
 contextBridge.exposeInMainWorld("desktopViewer", {
   openDialog: () => ipcRenderer.invoke("open-glb-dialog"),
@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld("desktopViewer", {
   getCameraSettings: () => ipcRenderer.invoke("get-camera-settings"),
   setCameraSettings: (settings) => ipcRenderer.invoke("set-camera-settings", settings),
   rememberFile: (filePath) => ipcRenderer.invoke("remember-file", filePath),
+  getPathForFile: (file) => webUtils.getPathForFile(file),
   onToggleViewSettings: (callback) => {
     ipcRenderer.on("toggle-view-settings", () => {
       callback();
