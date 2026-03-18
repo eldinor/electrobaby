@@ -2,7 +2,7 @@ const APP_CONFIG = {
   appId: "com.babylonpress.viewer",
   internalName: "electrobaby",
   productName: "BabylonPress GLB Viewer",
-  description: "Desktop GLB viewer powered by Babylon Viewer and Electron.",
+  description: "Desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
   links: {
     website: "https://babylonpress.org/",
     source: "https://example.com/source"
@@ -10,7 +10,7 @@ const APP_CONFIG = {
   files: {
     iconWindows: "bplogo.ico",
     iconDefault: "bplogo.svg",
-    modelExtensions: ["glb"]
+    modelExtensions: ["glb", "gltf"]
   },
   recent: {
     maxFiles: 10,
@@ -34,15 +34,16 @@ const APP_CONFIG = {
     }
   },
   ui: {
-    openModelDialogTitle: "Open GLB file",
+    openModelDialogTitle: "Open 3D model",
     modelFilterName: "3D Models",
     helpMenuLabel: "User Guide",
     aboutMenuLabel: "About BabylonPress GLB Viewer"
   },
   copy: {
     emptyState: {
-      title: "Drop a GLB file to begin",
-      bodyHtml: 'Drag a <kbd>.glb</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model'
+      title: "Drop a GLB or GLTF file to begin",
+      bodyHtml:
+        'Drag a <kbd>.glb</kbd> or <kbd>.gltf</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model'
     },
     viewPanel: {
       title: "View Settings",
@@ -81,12 +82,12 @@ const APP_CONFIG = {
         {
           title: "Open a Model",
           bodyHtml:
-            "<ol><li>Choose <kbd>File</kbd> -> <kbd>Open...</kbd>.</li><li>Select a valid <kbd>.glb</kbd> file.</li><li>The model will load in the viewer.</li></ol>"
+            "<ol><li>Choose <kbd>File</kbd> -> <kbd>Open...</kbd>.</li><li>Select a valid <kbd>.glb</kbd> or <kbd>.gltf</kbd> file.</li><li>The model will load in the viewer.</li></ol>"
         },
         {
           title: "Drag and Drop",
           bodyHtml:
-            "<p>Drop a <kbd>.glb</kbd> file directly into the window to open it.</p><p>If the file is invalid, the status banner will explain that the file should be checked.</p>"
+            "<p>Drop a <kbd>.glb</kbd> or <kbd>.gltf</kbd> file directly into the window to open it.</p><p>If the file is invalid, the status banner will explain that the file should be checked.</p><p><strong>Note:</strong> <kbd>.gltf</kbd> files may rely on nearby <kbd>.bin</kbd> and texture files.</p>"
         },
         {
           title: "Recent Items",
@@ -113,7 +114,7 @@ const APP_CONFIG = {
         {
           title: "Troubleshooting",
           bodyHtml:
-            "<ul><li>If a model does not load, confirm that the file is a valid <kbd>.glb</kbd>.</li><li>If the scene looks too dark, enable <kbd>Show Environment</kbd> in <kbd>Settings</kbd> -> <kbd>View...</kbd>.</li></ul>"
+            "<ul><li>If a model does not load, confirm that the file is a valid <kbd>.glb</kbd> or <kbd>.gltf</kbd>.</li><li>For <kbd>.gltf</kbd> files, keep the referenced <kbd>.bin</kbd> and texture files next to the model.</li><li>If the scene looks too dark, enable <kbd>Show Environment</kbd> in <kbd>Settings</kbd> -> <kbd>View...</kbd>.</li></ul>"
         }
       ]
     },
@@ -123,7 +124,7 @@ const APP_CONFIG = {
       createdByLabel: "Created by BabylonPress.org",
       sourceLabel: "Source",
       meta: [
-        { label: "Supported format", value: "GLB" },
+        { label: "Supported formats", value: "GLB, GLTF" },
         { label: "Main actions", value: "Open, drag-and-drop, recent files, view settings, camera settings" },
         { label: "Help shortcut", value: "F1" }
       ]

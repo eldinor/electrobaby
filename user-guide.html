@@ -129,7 +129,7 @@
     <section class="hero">
       <h1>BabylonPress GLB Viewer User Guide</h1>
       <p>
-        BabylonPress GLB Viewer is a desktop app for opening and inspecting <code>.glb</code> models.
+        BabylonPress GLB Viewer is a desktop app for opening and inspecting <code>.glb</code> and <code>.gltf</code> models.
         It supports drag-and-drop, recent files, visual view settings, and camera auto-rotate controls.
       </p>
     </section>
@@ -139,7 +139,7 @@
         <h2>Open a Model</h2>
         <ol class="steps">
           <li>Choose <kbd>File</kbd> -> <kbd>Open...</kbd>.</li>
-          <li>Select a valid <code>.glb</code> file.</li>
+          <li>Select a valid <code>.glb</code> or <code>.gltf</code> file.</li>
           <li>The model will load in the main viewer window.</li>
         </ol>
         <p>You can also press <kbd>Ctrl+O</kbd> on Windows or <kbd>Cmd+O</kbd> on macOS.</p>
@@ -147,8 +147,8 @@
 
       <article class="panel">
         <h2>Drag and Drop</h2>
-        <p>Drop a <code>.glb</code> file directly into the viewer window to open it.</p>
-        <p>If the file is not a valid GLB, the app will show an error message and suggest checking the file.</p>
+        <p>Drop a <code>.glb</code> or <code>.gltf</code> file directly into the viewer window to open it.</p>
+        <p>If the file is not a valid model, the app will show an error message and suggest checking the file.</p>
       </article>
 
       <article class="panel">
@@ -199,8 +199,9 @@
 
     <section class="warning">
       <strong>Troubleshooting:</strong>
-      If a model does not load, first confirm that the file is a valid <code>.glb</code>. If the screen looks too dark,
-      make sure the environment is enabled in <kbd>Settings</kbd> -> <kbd>View...</kbd>.
+      If a model does not load, first confirm that the file is a valid <code>.glb</code> or <code>.gltf</code>. For
+      <code>.gltf</code>, keep the referenced <code>.bin</code> and texture files next to the model. If the screen looks
+      too dark, make sure the environment is enabled in <kbd>Settings</kbd> -> <kbd>View...</kbd>.
     </section>
   </main>
 </body>

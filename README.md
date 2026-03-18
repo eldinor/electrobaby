@@ -1,16 +1,16 @@
 # BabylonPress GLB Viewer
 
-BabylonPress GLB Viewer is a desktop GLB viewer for Windows built with Electron and Babylon Viewer.
+BabylonPress GLB Viewer is a desktop GLB/GLTF viewer for Windows built with Electron and Babylon Viewer.
 
 It is designed as a lightweight desktop shell around `@babylonjs/viewer`, with file opening, recent files, drag-and-drop, view settings, camera settings, and in-app help.
 
 ## Features
 
-- Open `.glb` files from `File -> Open...`
-- Drag-and-drop `.glb` files into the viewer window
+- Open `.glb` and `.gltf` files from `File -> Open...`
+- Drag-and-drop `.glb` and `.gltf` files into the viewer window
 - Recent files and recent folders
 - Reopen last file on startup
-- File association support for `.glb` in packaged Windows builds
+- Optional installer-time Explorer association for `.glb` and `.gltf` in packaged Windows builds
 - `Settings -> View...`
 - `Settings -> Camera...`
 - `Help -> User Guide`
@@ -85,7 +85,7 @@ See `RELEASE.md` for the release checklist.
 - Windows is the only packaging target currently configured.
 - macOS packaging is not set up yet.
 - Linux packaging is not set up yet.
-- The app is focused on `.glb` viewing only.
+- `.gltf` models may depend on nearby `.bin` and texture files, so keep those sidecar files next to the model.
 
 ## Notes
 

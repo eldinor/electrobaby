@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "productName": "BabylonPress GLB Viewer",
   "license": "Apache-2.0",
-  "description": "BabylonPress GLB Viewer is a desktop GLB viewer powered by Babylon Viewer and Electron.",
+  "description": "BabylonPress GLB Viewer is a desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
   "author": {
     "name": "Andrei Stepanov",
     "email": "eldinor@gmail.com",
@@ -23,6 +23,7 @@
     "babylon-viewer",
     "electron",
     "glb",
+    "gltf",
     "3d-viewer",
     "windows"
   ],
@@ -59,15 +60,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
+      "include": "build/installer.nsh",
       "artifactName": "${productName}-Setup-${version}.${ext}"
-    },
-    "fileAssociations": [
-      {
-        "ext": "glb",
-        "name": "GLB Model",
-        "description": "GLB 3D Model",
-        "role": "Viewer"
-      }
-    ]
+    }
   }
 }

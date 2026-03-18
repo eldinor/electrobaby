@@ -6,7 +6,7 @@ function toFileUrl(windowsPath) {
 const DEFAULT_ENVIRONMENT_SOURCE = "auto";
 const FALLBACK_APP_CONFIG = {
   productName: "BabylonPress GLB Viewer",
-  description: "Desktop GLB viewer powered by Babylon Viewer and Electron.",
+  description: "Desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
   links: {
     website: "https://babylonpress.org/",
     source: "https://example.com/source"
@@ -30,8 +30,9 @@ const FALLBACK_APP_CONFIG = {
   },
   copy: {
     emptyState: {
-      title: "Drop a GLB file to begin",
-      bodyHtml: 'Drag a <kbd>.glb</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model'
+      title: "Drop a GLB or GLTF file to begin",
+      bodyHtml:
+        'Drag a <kbd>.glb</kbd> or <kbd>.gltf</kbd> file into this window <br>or use <kbd>File -> Open...</kbd> to load a model'
     },
     viewPanel: {
       title: "View Settings",
@@ -97,6 +98,17 @@ function getFileName(filePath) {
 
 function getViewer() {
   return document.getElementById("viewer");
+}
+
+function getSupportedModelExtensions() {
+  return Array.isArray(APP_CONFIG.files?.modelExtensions) && APP_CONFIG.files.modelExtensions.length
+    ? APP_CONFIG.files.modelExtensions.map((extension) => String(extension).toLowerCase())
+    : ["glb", "gltf"];
+}
+
+function isSupportedModelFileName(fileName) {
+  const normalizedName = String(fileName || "").toLowerCase();
+  return getSupportedModelExtensions().some((extension) => normalizedName.endsWith(`.${extension}`));
 }
 
 function setStatusMessage(message) {
@@ -184,7 +196,7 @@ function loadModel(filePath) {
   const source = toFileUrl(filePath);
   viewer.setAttribute("source", source);
   viewer.source = source;
-  document.title = `Babylon GLB Viewer - ${getFileName(filePath)}`;
+  document.title = `Babylon Viewer - ${getFileName(filePath)}`;
   setEmptyStateVisible(false);
 }
 
@@ -195,14 +207,14 @@ if (window.desktopViewer?.onOpenModel) {
 }
 
 function getErrorMessage(errorLike) {
-  const fallback = "The model could not be loaded. Check if the file is a valid GLB.";
+  const fallback = "The model could not be loaded. Check if the file is a valid GLB or GLTF.";
 
   if (errorLike?.message) {
-    return `${errorLike.message} Check if the file is a valid GLB.`;
+    return `${errorLike.message} Check if the file is a valid GLB or GLTF.`;
   }
 
   if (typeof errorLike === "string") {
-    return `${errorLike} Check if the file is a valid GLB.`;
+    return `${errorLike} Check if the file is a valid GLB or GLTF.`;
   }
 
   return fallback;
@@ -606,7 +618,7 @@ async function hydrateAboutPanel() {
     nameElement.textContent = appInfo?.name || APP_CONFIG.productName || "BabylonPress GLB Viewer";
     versionElement.textContent = `Version ${appInfo?.version || "1.0.0"}`;
     descriptionElement.textContent =
-      appInfo?.description || APP_CONFIG.description || "Desktop GLB viewer powered by Babylon Viewer and Electron.";
+      appInfo?.description || APP_CONFIG.description || "Desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.";
 
     if (appInfo?.viewerVersion) {
       const viewerVersionHtml = `<p><strong>Babylon Viewer:</strong> ${appInfo.viewerVersion}</p>`;
@@ -776,8 +788,8 @@ if (window.desktopViewer?.onToggleAboutPanel) {
   });
 }
 
-function isGlbFile(file) {
-  return Boolean(file?.name && file.name.toLowerCase().endsWith(".glb"));
+function isSupportedModelFile(file) {
+  return Boolean(file?.name && isSupportedModelFileName(file.name));
 }
 
 let dragDepth = 0;
@@ -811,8 +823,8 @@ window.addEventListener("drop", async (event) => {
   setDragState(false);
 
   const [file] = Array.from(event.dataTransfer?.files || []);
-  if (!isGlbFile(file)) {
-    setStatusMessage("Only .glb files can be dropped into the viewer.");
+  if (!isSupportedModelFile(file)) {
+    setStatusMessage("Only .glb and .gltf files can be dropped into the viewer.");
     return;
   }
 

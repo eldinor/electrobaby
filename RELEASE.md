@@ -5,8 +5,8 @@
 1. Confirm the app version in `package.json`.
 2. Run `npm install` if dependencies changed.
 3. Run `npm start` and do a quick smoke test:
-   - open a `.glb`
-   - drag and drop a `.glb`
+   - open a `.glb` or `.gltf`
+   - drag and drop a `.glb` or `.gltf`
    - open `Settings -> View...`
    - open `Settings -> Camera...`
    - open `Help -> About`

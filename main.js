@@ -15,6 +15,11 @@ const BABYLON_VIEWER_VERSION = getBabylonViewerVersion();
 let mainWindow = null;
 let pendingFileToOpen = getFilePathFromArgv(process.argv);
 
+function isSupportedModelPath(filePath) {
+  const extension = path.extname(filePath || "").toLowerCase().replace(/^\./, "");
+  return APP_CONFIG.files.modelExtensions.includes(extension);
+}
+
 function getBabylonViewerVersion() {
   try {
     return require("@babylonjs/viewer/package.json").version;
@@ -450,7 +455,7 @@ function getFilePathFromArgv(argv) {
     }
 
     const normalizedPath = path.resolve(value);
-    if (path.extname(normalizedPath).toLowerCase() === ".glb" && normalizeExistingFile(normalizedPath)) {
+    if (isSupportedModelPath(normalizedPath) && normalizeExistingFile(normalizedPath)) {
       return normalizedPath;
     }
   }
