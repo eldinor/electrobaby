@@ -1,7 +1,7 @@
 const APP_CONFIG = {
   appId: "com.babylonpress.viewer",
   internalName: "electrobaby",
-  productName: "BabylonPress GLB Viewer",
+  productName: "BabylonPress GLB GLTF Viewer",
   description: "Desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
   links: {
     website: "https://babylonpress.org/",
@@ -37,7 +37,7 @@ const APP_CONFIG = {
     openModelDialogTitle: "Open 3D model",
     modelFilterName: "3D Models",
     helpMenuLabel: "User Guide",
-    aboutMenuLabel: "About BabylonPress GLB Viewer"
+    aboutMenuLabel: "About BabylonPress GLB GLTF Viewer"
   },
   copy: {
     emptyState: {
@@ -114,7 +114,7 @@ const APP_CONFIG = {
         {
           title: "Troubleshooting",
           bodyHtml:
-            "<ul><li>If a model does not load, confirm that the file is a valid <kbd>.glb</kbd> or <kbd>.gltf</kbd>.</li><li>For <kbd>.gltf</kbd> files, keep the referenced <kbd>.bin</kbd> and texture files next to the model.</li><li>If the scene looks too dark, enable <kbd>Show Environment</kbd> in <kbd>Settings</kbd> -> <kbd>View...</kbd>.</li></ul>"
+            "<ul><li>If a model does not load, confirm that the file is a valid <kbd>.glb</kbd> or <kbd>.gltf</kbd>.</li><li>For <kbd>.gltf</kbd> files, make sure the file keeps valid references to its required <kbd>.bin</kbd> and texture files. </li><li>If the scene looks too dark, enable <kbd>Show Environment</kbd> in <kbd>Settings</kbd> -> <kbd>View...</kbd>.</li></ul>"
         }
       ]
     },

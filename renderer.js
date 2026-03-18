@@ -5,7 +5,7 @@ function toFileUrl(windowsPath) {
 
 const DEFAULT_ENVIRONMENT_SOURCE = "auto";
 const FALLBACK_APP_CONFIG = {
-  productName: "BabylonPress GLB Viewer",
+  productName: "BabylonPress GLB GLTF Viewer",
   description: "Desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
   links: {
     website: "https://babylonpress.org/",
@@ -207,17 +207,49 @@ if (window.desktopViewer?.onOpenModel) {
 }
 
 function getErrorMessage(errorLike) {
-  const fallback = "The model could not be loaded. Check if the file is a valid GLB or GLTF.";
+  const rawMessage =
+    typeof errorLike?.message === "string"
+      ? errorLike.message
+      : typeof errorLike === "string"
+        ? errorLike
+        : typeof errorLike?.detail?.message === "string"
+          ? errorLike.detail.message
+          : "";
+  const normalizedMessage = rawMessage.trim();
+  const lowerMessage = normalizedMessage.toLowerCase();
 
-  if (errorLike?.message) {
-    return `${errorLike.message} Check if the file is a valid GLB or GLTF.`;
+  if (!lowerMessage) {
+    return "The model could not be loaded. Check whether the file is a valid .glb or .gltf model.";
   }
 
-  if (typeof errorLike === "string") {
-    return `${errorLike} Check if the file is a valid GLB or GLTF.`;
+  if (
+    lowerMessage.includes("404") ||
+    lowerMessage.includes("not found") ||
+    lowerMessage.includes("failed to fetch") ||
+    lowerMessage.includes("networkerror") ||
+    lowerMessage.includes("network error")
+  ) {
+    return "The model could not be loaded because a required file was not found. For .gltf files, keep the .gltf, .bin, and texture files together in the same folder.";
   }
 
-  return fallback;
+  if (
+    lowerMessage.includes("unexpected token") ||
+    lowerMessage.includes("json") ||
+    lowerMessage.includes("parse")
+  ) {
+    return `The GLTF file appears to be invalid or malformed. ${normalizedMessage}`;
+  }
+
+  if (
+    lowerMessage.includes("magic") ||
+    lowerMessage.includes("glb") ||
+    lowerMessage.includes("binary") ||
+    lowerMessage.includes("chunk")
+  ) {
+    return `The GLB file appears to be invalid or corrupted. ${normalizedMessage}`;
+  }
+
+  return `${normalizedMessage} Check whether the file is a valid .glb or .gltf model.`;
 }
 
 function attachViewerErrorHandling() {
@@ -615,7 +647,7 @@ async function hydrateAboutPanel() {
 
   try {
     const appInfo = window.desktopViewer?.getAppInfo ? await window.desktopViewer.getAppInfo() : null;
-    nameElement.textContent = appInfo?.name || APP_CONFIG.productName || "BabylonPress GLB Viewer";
+    nameElement.textContent = appInfo?.name || APP_CONFIG.productName || "BabylonPress GLB GLTF Viewer";
     versionElement.textContent = `Version ${appInfo?.version || "1.0.0"}`;
     descriptionElement.textContent =
       appInfo?.description || APP_CONFIG.description || "Desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.";

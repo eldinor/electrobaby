@@ -2,7 +2,6 @@
 
 ## High Priority
 
-- Add a loading state with an overlay or progress bar while a model is opening.
 - Improve error UX so invalid or failed model loads show clearer, friendlier messages.
 - Test and harden packaged-app `.glb` file association behavior from Windows Explorer.
 

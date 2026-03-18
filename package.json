@@ -1,9 +1,9 @@
 {
   "name": "electrobaby",
   "version": "1.0.2",
-  "productName": "BabylonPress GLB Viewer",
+  "productName": "BabylonPress GLB GLTF Viewer",
   "license": "Apache-2.0",
-  "description": "BabylonPress GLB Viewer is a desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
+  "description": "BabylonPress GLB GLTF Viewer is a desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
   "author": {
     "name": "Andrei Stepanov",
     "email": "eldinor@gmail.com",
@@ -41,7 +41,7 @@
   },
   "build": {
     "appId": "com.electrobaby.viewer",
-    "productName": "BabylonPress GLB Viewer",
+    "productName": "BabylonPress GLB GLTF Viewer",
     "artifactName": "${productName}-${version}-${arch}.${ext}",
     "directories": {
       "output": "dist"

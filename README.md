@@ -1,6 +1,6 @@
-# BabylonPress GLB Viewer
+# BabylonPress GLB GLTF Viewer
 
-BabylonPress GLB Viewer is a desktop GLB/GLTF viewer for Windows built with Electron and Babylon Viewer.
+BabylonPress GLB GLTF Viewer is a desktop GLB/GLTF viewer for Windows built with Electron and Babylon Viewer.
 
 It is designed as a lightweight desktop shell around `@babylonjs/viewer`, with file opening, recent files, drag-and-drop, view settings, camera settings, and in-app help.
 
@@ -14,7 +14,7 @@ It is designed as a lightweight desktop shell around `@babylonjs/viewer`, with f
 - `Settings -> View...`
 - `Settings -> Camera...`
 - `Help -> User Guide`
-- `Help -> About BabylonPress GLB Viewer`
+- `Help -> About BabylonPress GLB GLTF Viewer`
 - Windows packaging with `electron-builder`
 
 ## Tech Stack
