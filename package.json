@@ -1,6 +1,6 @@
 {
   "name": "electrobaby",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "productName": "BabylonPress GLB GLTF Viewer",
   "license": "Apache-2.0",
   "description": "BabylonPress GLB GLTF Viewer is a desktop GLB/GLTF viewer powered by Babylon Viewer and Electron.",
@@ -48,7 +48,12 @@
     },
     "files": [
       "**/*",
-      "!dist/**"
+      "!dist/**",
+      "!test-assets/**",
+      "!tests/**",
+      "!test/**",
+      "!__tests__/**",
+      "!coverage/**"
     ],
     "win": {
       "target": [

@@ -58,3 +58,4 @@
 - Add a copyable diagnostics block with app version, Electron version, Babylon Viewer version, and OS info.
 - Tighten the app Content Security Policy before release.
 - Add tests for settings, recents, menu logic, and IPC handlers.
+- Add model URL pasting
